@@ -1,6 +1,19 @@
+using BookStore.Repo;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
+builder.Services.AddDbContext<BookStoreDbContext>(options =>
+    options
+    .UseLazyLoadingProxies()
+    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+    .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.DetachedLazyLoadingWarning))
+    .UseSqlServer(builder.Configuration.GetConnectionString("DbConnection")));
+
+builder.Services.AddScoped<IRepository<Author>, AuthorRepo>();
+builder.Services.AddScoped<IRepository<Book>, BookRepo>();
 
 builder.Services.AddControllersWithViews();
 

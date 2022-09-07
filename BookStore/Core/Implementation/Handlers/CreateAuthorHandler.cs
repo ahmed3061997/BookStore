@@ -22,7 +22,8 @@ namespace BookStore.Core.Implementations.Handlers
             if (request.Author == null)
                 throw new ArgumentNullException("request.Author");
 
-            await repository.Create(request.Author);
+            repository.Create(request.Author);
+            await repository.SaveChanges();
             return Unit.Value;
         }
     }

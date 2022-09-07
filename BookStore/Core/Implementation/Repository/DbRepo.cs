@@ -1,5 +1,6 @@
 ﻿using BookStore.Core.Domain;
 using BookStore.Core.Interfaces.Repository;
+using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -51,9 +52,29 @@ namespace BookStore.Core.Implementations.Repositiory
             return await dbSet.Where(expression).ToListAsync();
         }
 
+        public IQueryable<TEntity> OrderBy(Expression<Func<TEntity, bool>> expression)
+        {
+            return dbSet.OrderBy(expression);
+        }
+
+        public IQueryable<TEntity> OrderByDescending(Expression<Func<TEntity, bool>> expression)
+        {
+            return dbSet.OrderByDescending(expression);
+        }
+
         public async Task<int> SaveChanges()
         {
             return await context.SaveChangesAsync();
+        }
+
+        public IQueryable<TEntity> Skip(int skip)
+        {
+            return dbSet.Skip(skip);
+        }
+
+        public IQueryable<TEntity> Take(int count)
+        {
+            return dbSet.Take(count);
         }
 
         public void Update(TEntity entity)

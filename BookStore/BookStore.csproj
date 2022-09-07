@@ -33,7 +33,8 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Core\Interfaces\Queries\" />
+    <Folder Include="Core\Implementation\Commands\" />
+    <Folder Include="Core\Implementation\Queries\" />
     <Folder Include="Models\" />
   </ItemGroup>
 

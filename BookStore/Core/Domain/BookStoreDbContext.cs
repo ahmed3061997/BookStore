@@ -1,12 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace BookStore.Repo
+namespace BookStore.Core.Domain
 {
-    public class BookStoreDbContext :  DbContext
+    public class BookStoreDbContext : DbContext
     {
         public BookStoreDbContext()
         {

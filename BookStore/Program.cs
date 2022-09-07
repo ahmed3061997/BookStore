@@ -1,6 +1,10 @@
-using BookStore.Repo;
+using BookStore.Core.Domain;
+using BookStore.Core.Implementations.Repositiory;
+using BookStore.Core.Interfaces.Repository;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +18,7 @@ builder.Services.AddDbContext<BookStoreDbContext>(options =>
 
 builder.Services.AddScoped<IRepository<Author>, AuthorRepo>();
 builder.Services.AddScoped<IRepository<Book>, BookRepo>();
+builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 
 builder.Services.AddControllersWithViews();
 

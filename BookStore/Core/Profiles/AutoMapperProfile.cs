@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BookStore.Core.Domain;
-using BookStore.Core.Interfaces.Commands;
+using BookStore.Core.Features.Auhors.Commands;
+using BookStore.Core.Features.Books.Commands;
 
 namespace BookStore.Core.Profiles
 {

@@ -6,9 +6,11 @@ export function Authors() {
 
     useEffect(() => {
         const fetchData = async () => {
-            var response = await fetch('/api/authors/get?page=1&size=10');
-            const result = await response.json();
-            setData(result);
+            var response = await fetch('/api/authors/get?currentPage=1&pageSize=10');
+            const res = await response.json();
+            if (res.result) {
+                setData(res.value);
+            }
         }
         fetchData();
     }, []);

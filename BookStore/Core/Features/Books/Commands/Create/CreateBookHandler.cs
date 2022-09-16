@@ -2,41 +2,45 @@
 using BookStore.Core.Domain;
 using BookStore.Core.Generic.Responses;
 using BookStore.Core.Repository;
-using BookStore.Core.Services;
 using MediatR;
+using BookStore.Core.Services;
+using BookStore.Core.Features.Books.Service;
+using BookStore.Core.Generic.Exceptions;
 
 namespace BookStore.Core.Features.Books.Commands
 {
     public class CreateBookHandler : IRequestHandler<CreateBook, IResultResponse<Guid?>>
     {
-        private readonly IRepository<Book> repository;
         private readonly IFileManager fileManager;
+        private readonly IBookService service;
         private readonly IMapper mapper;
 
-        public CreateBookHandler(IRepository<Book> repository, IMapper mapper, IFileManager fileManager)
+        public CreateBookHandler(IBookService service, IMapper mapper, IFileManager fileManager)
         {
-            this.repository = repository;
+            this.service = service;
             this.mapper = mapper;
             this.fileManager = fileManager;
         }
 
         public async Task<IResultResponse<Guid?>> Handle(CreateBook request, CancellationToken cancellationToken)
         {
-            var validator = new CreateBookValidator();
-            var result = validator.Validate(request);
-            if (!result.IsValid)
+            try
             {
-                return new ResultResponse<Guid?>() { Result = false, Errors = result.Errors.Select(x => x.ErrorMessage) };
+                var book = mapper.Map<Book>(request);
+                book.Id = Guid.NewGuid();
+                book.CoverImg = fileManager.SaveFile(request.CoverImgFile);
+
+                await service.Create(book);
+                return new ResultResponse<Guid?>() { Result = true, Errors = null, Value = book.Id };
             }
-
-            var book = mapper.Map<Book>(request);
-            book.Id = Guid.NewGuid();
-            book.CoverImg = fileManager.SaveFile(request.CoverImgFile);
-
-            repository.Create(book);
-            await repository.SaveChanges();
-
-            return new ResultResponse<Guid?>() { Result = true, Errors = null, Value = book.Id };
+            catch (ValidationException ex)
+            {
+                return new ResultResponse<Guid?>() { Result = false, Errors = ex.Errors.Select(x => x.ErrorMessage) };
+            }
+            catch (Exception ex)
+            {
+                return new ResultResponse<Guid?>() { Result = false, Errors = new[] { ex.Message } };
+            }
         }
     }
 }

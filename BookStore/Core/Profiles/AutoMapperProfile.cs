@@ -10,7 +10,9 @@ namespace BookStore.Core.Profiles
         public AutoMapperProfile()
         {
             CreateMap<ICreateAuthor, Author>();
+            CreateMap<IUpdateAuthor, Author>();
             CreateMap<ICreateBook, Book>();
+            CreateMap<IUpdateBook, Book>();
         }
     }
 }

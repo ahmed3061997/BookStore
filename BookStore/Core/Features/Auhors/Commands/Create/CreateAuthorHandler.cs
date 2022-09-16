@@ -2,41 +2,45 @@
 using BookStore.Core.Domain;
 using BookStore.Core.Generic.Responses;
 using BookStore.Core.Repository;
-using BookStore.Core.Services;
 using MediatR;
+using BookStore.Core.Services;
+using BookStore.Core.Features.Auhors.Service;
+using BookStore.Core.Generic.Exceptions;
 
 namespace BookStore.Core.Features.Auhors.Commands
 {
     public class CreateAuthorHandler : IRequestHandler<CreateAuthor, IResultResponse<Guid?>>
     {
-        private readonly IRepository<Author> repository;
         private readonly IFileManager fileManager;
+        private readonly IAuthorService service;
         private readonly IMapper mapper;
 
-        public CreateAuthorHandler(IRepository<Author> repository, IMapper mapper, IFileManager fileManager)
+        public CreateAuthorHandler(IAuthorService service, IMapper mapper, IFileManager fileManager)
         {
-            this.repository = repository;
+            this.service = service;
             this.mapper = mapper;
             this.fileManager = fileManager;
         }
 
         public async Task<IResultResponse<Guid?>> Handle(CreateAuthor request, CancellationToken cancellationToken)
         {
-            var validator = new CreateAuthorValidator();
-            var result = validator.Validate(request);
-            if (!result.IsValid)
+            try
             {
-                return new ResultResponse<Guid?>() { Result = false, Errors = result.Errors.Select(x => x.ErrorMessage) };
+                var author = mapper.Map<Author>(request);
+                author.Id = Guid.NewGuid();
+                author.Image = fileManager.SaveFile(request.ImageFile);
+
+                await service.Create(author);
+                return new ResultResponse<Guid?>() { Result = true, Errors = null, Value = author.Id };
             }
-
-            var author = mapper.Map<Author>(request);
-            author.Id = Guid.NewGuid();
-            author.Image = fileManager.SaveFile(request.ImageFile);
-
-            repository.Create(author);
-            await repository.SaveChanges();
-
-            return new ResultResponse<Guid?>() { Result = true, Errors = null, Value = author.Id };
+            catch (ValidationException ex)
+            {
+                return new ResultResponse<Guid?>() { Result = false, Errors = ex.Errors.Select(x => x.ErrorMessage) };
+            }
+            catch (Exception ex)
+            {
+                return new ResultResponse<Guid?>() { Result = false, Errors = new[] { ex.Message } };
+            }
         }
     }
 }

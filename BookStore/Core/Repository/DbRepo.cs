@@ -67,6 +67,11 @@ namespace BookStore.Core.Repositiory
             return await context.SaveChangesAsync();
         }
 
+        public IQueryable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> expression)
+        {
+            throw new NotImplementedException();
+        }
+
         public IQueryable<TEntity> Skip(int skip)
         {
             return dbSet.Skip(skip);

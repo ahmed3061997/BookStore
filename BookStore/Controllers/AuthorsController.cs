@@ -1,17 +1,16 @@
 ﻿using BookStore.Core.Domain;
 using BookStore.Core.Features.Auhors.Commands;
+using BookStore.Core.Features.Auhors.Dto;
 using BookStore.Core.Features.Auhors.Queries;
+using BookStore.Core.Features.Auhors.Queries.GetAllDto;
 using BookStore.Core.Generic.Responses;
 using MediatR;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace BookStore.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AuthorsController : ControllerBase
@@ -30,8 +29,15 @@ namespace BookStore.Controllers
             return response;
         }
 
+        [HttpGet("get_all")]
+        public async Task<IResultResponse<IEnumerable<AuthorDto>>> GetAllDto()
+        {
+            var response = await mediator.Send(new GetAuthorsDto());
+            return response;
+        }
+
         [HttpPost("create")]
-        public async Task<IResultResponse<Guid?>> Create([FromForm] ICreateAuthor request)
+        public async Task<IResultResponse<Guid?>> Create([FromForm] CreateAuthor request)
         {
             var response = await mediator.Send(request);
             return response;

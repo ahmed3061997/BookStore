@@ -1,4 +1,6 @@
-﻿namespace BookStore.Core.Generic.Responses
+﻿using System.Runtime.Serialization;
+
+namespace BookStore.Core.Generic.Responses
 {
     public interface IResponse
     {

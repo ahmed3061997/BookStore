@@ -44,7 +44,7 @@ namespace BookStore.Core.Features.Books.Service
                 throw new ArgumentException("Invalid value", "size");
             }
 
-            return await repository.Skip(page * size).Take(size).ToListAsync();
+            return await repository.Skip((page - 1) * size).Take(size).ToListAsync();
         }
 
         public async Task Update(Book book)

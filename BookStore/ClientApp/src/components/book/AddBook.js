@@ -12,22 +12,26 @@ export function AddBook() {
         var formData = new FormData();
         formData.append('Name', data.Name);
         formData.append('Description', data.Description);
-        formData.append('AuthodId', author.id);
-        formData.append('CoverImg', data.CoverImg[0]);
+        formData.append('AuthorId', author.id);
+        formData.append('CoverImgFile', data.CoverImg[0]);
         var response = await fetch('/api/books/create', {
             method: 'post',
             body: formData
         });
-        const result = await response.json();
-        if (result === true)
+        const res = await response.json();
+        if (res.result === true)
             window.location.href = '/';
     }
 
     useEffect(() => {
         const fetchData = async () => {
             var response = await fetch('/api/authors/get_all');
-            const result = await response.json();
-            setAuthors(result);
+            const res = await response.json();
+            if (res.result) {
+                setAuthors(res.value);
+            } else {
+                console.log(res.errors);
+            }
         }
         fetchData();
     }, []);
@@ -35,21 +39,21 @@ export function AddBook() {
     return (
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="form-group">
+                <div className="form-group mb-4">
                     <label htmlFor="Name">Name</label>
                     <input type="text" className="form-control" id="Name" name="Name" {...register('Name', { required: true })} placeholder="Name" />
                     {errors.Name && <small className="text-danger">This field is required</small>}
                 </div>
-                <div className="form-group">
+                <div className="form-group mb-4">
                     <label htmlFor="Description">Description</label>
                     <input type="text" className="form-control" id="Description" name="Description" {...register('Description', { required: true })} placeholder="Description" />
                     {errors.Description && <small className="text-danger">This field is required</small>}
                 </div>
-                <div className="form-group">
+                <div className="form-group mb-4">
                     <label htmlFor="Author">Author</label>
                     <div className="dropdown author-dropdown">
-                        <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {...register('Author', { required: author.id == null })}>
-                            <img className="dropdown-avatar" src={author.image} alt="Avatar" />
+                        <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {...register('Author', { required: author.id == null })}>
+                            <img className="dropdown-avatar" src={author.image} />
                             <span>{author.name}</span>
                         </button>
                         <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -57,7 +61,7 @@ export function AddBook() {
                                 authors.map((x, i) => {
                                     return (
                                         <button key={i} className="dropdown-item" type="button" onClick={() => setAuthor(x)}>
-                                            <img className="dropdown-avatar" src={x.image} alt="{x.name}" />
+                                            <img className="dropdown-avatar" src={x.image} />
                                             <span>{x.name}</span>
                                         </button>
                                     )
@@ -67,9 +71,9 @@ export function AddBook() {
                     </div>
                     {errors.Author && <small className="text-danger">This field is required</small>}
                 </div>
-                <div className="form-group">
+                <div className="d-flex flex-column mb-4">
                     <label htmlFor="CoverImg">Cover Image</label>
-                    <input type="file" className="form-control-file" id="CoverImg" name="CoverImg" multiple={false} {...register('CoverImg', { required: true })} />
+                    <input type="file" className="form-control-file mt-2" id="CoverImg" name="CoverImg" multiple={false} {...register('CoverImg', { required: true })} />
                     {errors.CoverImg && <small className="text-danger">This field is required</small>}
                 </div>
                 <div className="d-flex justify-content-end">

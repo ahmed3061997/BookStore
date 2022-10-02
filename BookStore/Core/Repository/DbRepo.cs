@@ -69,7 +69,7 @@ namespace BookStore.Core.Repositiory
 
         public IQueryable<TResult> Select<TResult>(Expression<Func<TEntity, TResult>> expression)
         {
-            throw new NotImplementedException();
+            return dbSet.Select(expression);
         }
 
         public IQueryable<TEntity> Skip(int skip)

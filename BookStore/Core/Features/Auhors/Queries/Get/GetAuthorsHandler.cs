@@ -1,6 +1,9 @@
-﻿using BookStore.Core.Domain;
+﻿using AutoMapper;
+using BookStore.Core.Domain;
+using BookStore.Core.Features.Auhors.Service;
 using BookStore.Core.Generic.Responses;
 using BookStore.Core.Repository;
+using BookStore.Core.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,27 +11,24 @@ namespace BookStore.Core.Features.Auhors.Queries
 {
     public class GetAuthorsHandler : IRequestHandler<GetAuthors, IResultResponse<IEnumerable<Author>>>
     {
-        private readonly IQueryRepository<Author> repository;
+        private readonly IAuthorService service;
 
-        public GetAuthorsHandler(IQueryRepository<Author> repository)
+        public GetAuthorsHandler(IAuthorService service)
         {
-            this.repository = repository;
+            this.service = service;
         }
 
         public async Task<IResultResponse<IEnumerable<Author>>> Handle(GetAuthors request, CancellationToken cancellationToken)
         {
-            var validator = new GetAuthorsValidator();
-            var result = validator.Validate(request);
-            if (!result.IsValid)
+            try
             {
-                return new ResultResponse<IEnumerable<Author>>() { Result = true, Errors = result.Errors.Select(x => x.ErrorMessage) };
-
+                var list = await service.GetPage(request.CurrentPage, request.PageSize);
+                return new ResultResponse<IEnumerable<Author>>() { Result = true, Errors = null, Value = list };
             }
-
-            var skip = request.PageSize * (request.CurrentPage - 1);
-            var list = await repository.Skip(skip).Take(request.PageSize).ToListAsync();
-
-            return new ResultResponse<IEnumerable<Author>>() { Result = true, Errors = null, Value = list };
+            catch (Exception ex)
+            {
+                return new ResultResponse<IEnumerable<Author>>() { Result = false, Errors = new[] { ex.Message } };
+            }
         }
     }
 }

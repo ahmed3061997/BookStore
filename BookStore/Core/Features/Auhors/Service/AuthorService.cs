@@ -1,4 +1,5 @@
 ﻿using BookStore.Core.Domain;
+using BookStore.Core.Features.Auhors.Dto;
 using BookStore.Core.Generic.Dto;
 using BookStore.Core.Generic.Exceptions;
 using BookStore.Core.Generic.Responses;
@@ -38,9 +39,9 @@ namespace BookStore.Core.Features.Auhors.Service
             return await repository.SaveChanges() > 0;
         }
 
-        public async Task<IEnumerable<ObjectDto>> GetAllDto()
+        public async Task<IEnumerable<AuthorDto>> GetAllDto()
         {
-            return await repository.Select(x => new ObjectDto(x.Id, x.Name)).ToListAsync();
+            return await repository.Select(x => new AuthorDto() { Id = x.Id, Name = x.Name, Image = x.Image }).ToListAsync();
         }
 
         public async Task<IEnumerable<Author>> GetPage(int page, int size)
@@ -54,7 +55,7 @@ namespace BookStore.Core.Features.Auhors.Service
                 throw new ArgumentException("Invalid value", "size");
             }
 
-            return await repository.Skip(page * size).Take(size).ToListAsync();
+            return await repository.Skip((page - 1) * size).Take(size).ToListAsync();
         }
 
         public async Task Update(Author author)

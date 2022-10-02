@@ -1,4 +1,5 @@
 ﻿using BookStore.Core.Domain;
+using BookStore.Core.Features.Books.Service;
 using BookStore.Core.Generic.Responses;
 using BookStore.Core.Repository;
 using MediatR;
@@ -8,27 +9,24 @@ namespace BookStore.Core.Features.Books.Queries
 {
     public class GetBooksHandler : IRequestHandler<GetBooks, IResultResponse<IEnumerable<Book>>>
     {
-        private readonly IQueryRepository<Book> repository;
+        private readonly IBookService service;
 
-        public GetBooksHandler(IQueryRepository<Book> repository)
+        public GetBooksHandler(IBookService service)
         {
-            this.repository = repository;
+            this.service = service;
         }
 
         public async Task<IResultResponse<IEnumerable<Book>>> Handle(GetBooks request, CancellationToken cancellationToken)
         {
-            var validator = new GetBooksValidator();
-            var result = validator.Validate(request);
-            if (!result.IsValid)
+            try
             {
-                return new ResultResponse<IEnumerable<Book>>() { Result = true, Errors = result.Errors.Select(x => x.ErrorMessage) };
-
+                var list = await service.GetPage(request.CurrentPage, request.PageSize);
+                return new ResultResponse<IEnumerable<Book>>() { Result = true, Errors = null, Value = list };
             }
-
-            var skip = request.PageSize * (request.CurrentPage - 1);
-            var list = await repository.Skip(skip).Take(request.PageSize).ToListAsync();
-
-            return new ResultResponse<IEnumerable<Book>>() { Result = true, Errors = null, Value = list };
+            catch (Exception ex)
+            {
+                return new ResultResponse<IEnumerable<Book>>() { Result = false, Errors = new[] { ex.Message } };
+            }
         }
     }
 }

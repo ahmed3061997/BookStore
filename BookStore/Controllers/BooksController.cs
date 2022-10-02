@@ -3,6 +3,7 @@ using BookStore.Core.Features.Books.Commands;
 using BookStore.Core.Features.Books.Queries;
 using BookStore.Core.Generic.Responses;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ using System.IO;
 
 namespace BookStore.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class BooksController : ControllerBase
@@ -24,14 +26,14 @@ namespace BookStore.Controllers
         }
 
         [HttpGet("get")]
-        public async Task<IResultResponse<IEnumerable<Book>>> GetPage(GetBooks request)
+        public async Task<IResultResponse<IEnumerable<Book>>> GetPage([FromQuery] GetBooks request)
         {
             var response = await mediator.Send(request);
             return response;
         }
 
         [HttpPost("create")]
-        public async Task<IResultResponse<Guid?>> Create([FromForm] ICreateBook request)
+        public async Task<IResultResponse<Guid?>> Create([FromForm] CreateBook request)
         {
             var response = await mediator.Send(request);
             return response;

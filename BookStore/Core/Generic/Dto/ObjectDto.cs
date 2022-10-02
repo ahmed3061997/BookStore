@@ -1,4 +1,8 @@
 ﻿namespace BookStore.Core.Generic.Dto
 {
-    public record ObjectDto(Guid Id, string Name);
+    public class ObjectDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+    }
 }

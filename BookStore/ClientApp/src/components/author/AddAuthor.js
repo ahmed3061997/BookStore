@@ -8,7 +8,7 @@ export function AddAuthor() {
         var formData = new FormData();
         formData.append('Name', data.Name);
         formData.append('Category', data.Category);
-        formData.append('Img', data.Img[0]);
+        formData.append('ImageFile', data.Img[0]);
         var response = await fetch('/api/authors/create', {
             method: 'post',
             body: formData

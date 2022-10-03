@@ -9,7 +9,10 @@ import { ProtectedRoute } from "./ProtectedRoute";
 const AppRoutes = [
     {
         index: true,
-        element: <ProtectedRoute />
+        element:
+            <ProtectedRoute>
+                <Books />
+            </ProtectedRoute>
     },
     {
         path: '/register',

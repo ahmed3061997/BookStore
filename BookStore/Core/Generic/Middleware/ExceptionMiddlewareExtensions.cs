@@ -1,6 +1,9 @@
 ﻿using BookStore.Core.Generic.Responses;
+using BookStore.Core.Generic.Utils;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Text.Json;
 
 namespace BookStore.Core.Generic.Middleware
 {
@@ -22,9 +25,27 @@ namespace BookStore.Core.Generic.Middleware
                             Result = false,
                             Errors = new[] { contextFeature.Error.Message }
                         };
-                        await context.Response.WriteAsync(res.ToString());
+                        await context.Response.WriteAsync(Helper.Json(res));
                     }
                 });
+            });
+        }
+
+        public static void ConfigureInvalidModelState(this IServiceCollection services)
+        {
+            services.Configure<ApiBehaviorOptions>(op =>
+            {
+                op.InvalidModelStateResponseFactory = (context) =>
+                {
+                    var modelState = context.ModelState.Values;
+                    var errors = context.ModelState.Values.SelectMany(v => v.Errors).Select(x => x.ErrorMessage);
+                    var res = new Response()
+                    {
+                        Result = false,
+                        Errors = errors
+                    };
+                    return new JsonResult(res) { StatusCode = StatusCodes.Status400BadRequest };
+                };
             });
         }
     }

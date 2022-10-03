@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap/dist/js/bootstrap.js';
 import '@popperjs/core';
 import 'jquery';
 import React from 'react';
@@ -8,10 +6,27 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
+import axios from 'axios';
+
+// js
+import 'bootstrap/dist/js/bootstrap.js';
+
+// css
+import './assets/css/style.scss';
+import 'bootstrap/dist/css/bootstrap.css';
+
 
 const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
 const rootElement = document.getElementById('root');
 const root = createRoot(rootElement);
+
+axios.interceptors.request.use(function (config) {
+    const token = localStorage.getItem('access-token');
+    config.headers.Authorization = `bearer ${token}`;
+
+    return config;
+});
+
 
 root.render(
   <BrowserRouter basename={baseUrl}>

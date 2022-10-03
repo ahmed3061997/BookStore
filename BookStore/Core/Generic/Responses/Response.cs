@@ -8,13 +8,5 @@ namespace BookStore.Core.Generic.Responses
     {
         public bool Result { get; set; }
         public IEnumerable<string>? Errors { get; set ; }
-
-        public override string ToString()
-        {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            });
-        }
     }
 }

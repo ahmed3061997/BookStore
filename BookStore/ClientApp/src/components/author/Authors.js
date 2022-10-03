@@ -1,4 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
+import { Layout } from '../shared/Layout';
 import { Author } from './Author';
 
 export function Authors() {
@@ -16,20 +17,21 @@ export function Authors() {
     }, []);
 
     return (
+        <Layout>
+            <div>
+                <div className="d-flex justify-content-end mb-4">
+                    <a href="/authors/add" type="button" className="btn btn-outline-success">
+                        <i className="fa fa-plus mr-2"></i>
+                        Add
+                    </a>
+                </div>
 
-        <div>
-            <div className="d-flex justify-content-end mb-4">
-                <a href="/authors/add" type="button" className="btn btn-outline-success">
-                    <i className="fa fa-plus mr-2"></i>
-                    Add
-                </a>
+                <div className="row pb-5 mb-4">
+                    {
+                        data.map((x, key) => <Author key={key} data={x} />)
+                    }
+                </div>
             </div>
-
-            <div className="row pb-5 mb-4">
-                {
-                    data.map((x, key) => <Author key={key} data={x} />)
-                }
-            </div>
-        </div>
+        </Layout>
     );
 }

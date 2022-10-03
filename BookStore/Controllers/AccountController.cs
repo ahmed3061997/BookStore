@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using BookStore.Core.Domain;
 using BookStore.Core.Generic.Constants;
+using BookStore.Core.Generic.Dto;
 using BookStore.Core.Generic.Responses;
+using BookStore.Core.Services.Authentication;
 using BookStore.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -16,59 +18,41 @@ namespace BookStore.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IMapper mapper;
-        private readonly UserManager<User> userManager;
-        private readonly SignInManager<User> signInManager;
+        private readonly IUserService userService;
 
-        public AccountController(IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(IMapper mapper, IUserService userService)
         {
             this.mapper = mapper;
-            this.userManager = userManager;
-            this.signInManager = signInManager;
+            this.userService = userService;
         }
 
         [HttpPost("register")]
-        public async Task<IResponse> Register(UserRegistrationModel userModel)
+        public async Task<IResultResponse<JwtToken>> Register(UserRegistrationModel userModel)
         {
             if (!ModelState.IsValid)
             {
-                return new Response() { Result = false, Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) };
+                return new ResultResponse<JwtToken>() { Result = false, Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) };
             }
             var user = mapper.Map<User>(userModel);
-            var result = await userManager.CreateAsync(user, userModel.Password);
-            if (!result.Succeeded)
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.TryAddModelError(error.Code, error.Description);
-                }
-                return new Response() { Result = false, Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) };
-            }
-            await userManager.AddToRoleAsync(user, Roles.Visitor);
-            return new Response() { Result = true };
+            var result = await userService.CreateUser(user, userModel.Password);
+            return new ResultResponse<JwtToken>() { Result = result.Succeeded, Errors = result.Errors, Value = result.Token };
         }
 
         [HttpPost("login")]
-        public async Task<IResponse> Login(UserLoginModel userModel)
+        public async Task<IResultResponse<JwtToken>> Login(UserLoginModel userModel)
         {
             if (!ModelState.IsValid)
             {
-                return new Response() { Result = false, Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) };
+                return new ResultResponse<JwtToken>() { Result = false, Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) };
             }
-            var result = await signInManager.PasswordSignInAsync(userModel.Email, userModel.Password, userModel.RememberMe, false);
-            if (result.Succeeded)
-            {
-                return new Response() { Result = true };
-            }
-            else
-            {
-                return new Response() { Result = false, Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage) };
-            }
+            var result = await userService.Login(userModel.Email, userModel.Password);
+            return new ResultResponse<JwtToken>() { Result = result.Succeeded, Errors = result.Errors, Value = result.Token };
         }
 
         [HttpPost("logout")]
         public async Task<IResponse> Logout()
         {
-            await signInManager.SignOutAsync();
+            await userService.Logout();
             return new Response() { Result = true };
         }
     }

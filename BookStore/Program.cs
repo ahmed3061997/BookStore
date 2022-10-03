@@ -2,18 +2,37 @@ using BookStore.Core.Domain;
 using BookStore.Core.Features.Auhors.Service;
 using BookStore.Core.Features.Books.Service;
 using BookStore.Core.Generic.Middleware;
+using BookStore.Core.Generic.Utils;
 using BookStore.Core.Repositiory;
 using BookStore.Core.Repository;
 using BookStore.Core.Services;
 using BookStore.Core.Services.Authentication;
 using BookStore.Core.Services.MigrationManager;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IQueryRepository<Author>, AuthorRepo>();
+builder.Services.AddScoped<IQueryRepository<Book>, BookRepo>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IFileManager, FileManager>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITokenService, JwtTokenService>();
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<User>, CustomClaimsFactory>();
+
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
+
+builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<BookStoreDbContext>(options =>
     options
@@ -31,18 +50,6 @@ builder.Services.AddIdentity<User, IdentityRole>(opt =>
 })
     .AddEntityFrameworkStores<BookStoreDbContext>();
 
-builder.Services.AddScoped<IQueryRepository<Author>, AuthorRepo>();
-builder.Services.AddScoped<IQueryRepository<Book>, BookRepo>();
-builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddScoped<IAuthorService, AuthorService>();
-builder.Services.AddScoped<IFileManager, FileManager>();
-builder.Services.AddScoped<IUserClaimsPrincipalFactory<User>, CustomClaimsFactory>();
-
-builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
-builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
-
-builder.Services.AddControllersWithViews();
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("cors_policy", policy =>
@@ -52,6 +59,30 @@ builder.Services.AddCors(options =>
         .AllowAnyMethod();
     });
 });
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(o =>
+    {
+        o.RequireHttpsMetadata = false;
+        o.SaveToken = false;
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
+
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+builder.Services.ConfigureInvalidModelState();
 
 var app = builder.Build();
 
@@ -67,6 +98,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseCors("cors_policy");
 app.UseAuthentication();
+app.UseAuthorization();
 app.ConfigureExceptionHandler();
 
 app.MapControllerRoute(

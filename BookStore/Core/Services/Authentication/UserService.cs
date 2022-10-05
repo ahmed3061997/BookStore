@@ -75,6 +75,14 @@ namespace BookStore.Core.Services.Authentication
             return result;
         }
 
+        public async Task<AuthResult> RefreshToken(string token)
+        {
+            var result = new AuthResult();
+            result.Succeeded = true;
+            result.Token = await tokenService.RefreshToken(token);
+            return result;
+        }
+
         public async Task Logout()
         {
             await signInManager.SignOutAsync();

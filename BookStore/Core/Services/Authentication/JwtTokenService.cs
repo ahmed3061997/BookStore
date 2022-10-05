@@ -3,10 +3,12 @@ using BookStore.Core.Generic.Constants;
 using BookStore.Core.Generic.Dto;
 using BookStore.Core.Generic.Utils;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace BookStore.Core.Services.Authentication
@@ -48,21 +50,65 @@ namespace BookStore.Core.Services.Authentication
                 issuer: jwt.Issuer,
                 audience: jwt.Audience,
                 claims: claims,
-                expires: DateTime.Now.AddDays(jwt.DurationInDays),
+                expires: DateTime.UtcNow.AddMinutes(jwt.DurationInMinutes),
                 signingCredentials: signingCredentials);
 
             var token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
+            RefreshToken refreshToken;
+            if (user.RefreshTokens.Any(x => x.IsActive))
+            {
+                refreshToken = user.RefreshTokens.FirstOrDefault(x => x.IsActive);
+            }
+            else
+            {
+                refreshToken = GenerateRefreshToken();
+                //user.RefreshTokens.RemoveAll(x => true);
+                user.RefreshTokens.Add(refreshToken);
+                await userManager.UpdateAsync(user);
+            }
+
             return new JwtToken()
             {
                 Token = token,
-                RefreshToken = ""
+                RefreshToken = refreshToken.Token,
+                RefreshTokenExpiresOn = refreshToken.ExpiresOn,
             };
         }
 
-        //public Task<JwtToken> RefreshToken(User user, string refreshToken)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public async Task<JwtToken> RefreshToken(string token)
+        {
+            var user = await userManager.Users.SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("Refresh token is invalid");
+            }
+
+            var refreshToken = user.RefreshTokens.Single(t => t.Token == token);
+            if (!refreshToken.IsActive)
+            {
+                throw new UnauthorizedAccessException("Refresh token is invalid");
+            }
+
+            refreshToken.RevokedOn = DateTime.UtcNow;
+            await userManager.UpdateAsync(user);
+
+            return await GenerateToken(user);
+        }
+
+        private RefreshToken GenerateRefreshToken()
+        {
+            var random = new byte[64];
+
+            using var generator = RandomNumberGenerator.Create();
+            generator.GetBytes(random);
+
+            return new RefreshToken()
+            {
+                Token = Convert.ToBase64String(random),
+                ExpiresOn = DateTime.UtcNow.AddMinutes(jwt.RefreshTokenDurationInMinutes),
+                CreatedOn = DateTime.UtcNow,
+            };
+        }
     }
 }

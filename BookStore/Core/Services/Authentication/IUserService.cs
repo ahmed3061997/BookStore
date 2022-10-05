@@ -8,6 +8,7 @@ namespace BookStore.Core.Services.Authentication
     {
         Task<AuthResult> CreateUser(User user, string password);
         Task<AuthResult> Login(string username, string password);
+        Task<AuthResult> RefreshToken(string token);
         Task Logout();
     }
 }

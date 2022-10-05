@@ -6,6 +6,7 @@ namespace BookStore.Core.Services.Authentication
     public interface ITokenService
     {
         Task<JwtToken> GenerateToken(User user);
-        //Task<JwtToken> RefreshToken(User user, string refreshToken);
+
+        Task<JwtToken> RefreshToken(string token);
     }
 }

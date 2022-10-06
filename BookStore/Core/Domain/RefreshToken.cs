@@ -1,5 +1,8 @@
-﻿namespace BookStore.Core.Domain
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace BookStore.Core.Domain
 {
+    [Owned]
     public class RefreshToken
     {
         public Guid Id { get; set; }

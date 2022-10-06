@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../api';
 import { useForm } from 'react-hook-form';
 import { FallingLines } from 'react-loader-spinner'
 
@@ -11,7 +11,7 @@ export function Login() {
     const onSubmit = (data) => {
         setErrors([]);
         setLoading(true);
-        axios.post('/api/account/login', data)
+        api.post('/account/login', data)
             .then((res) => {
                 setLoading(false);
                 if (res.data.result === true) {

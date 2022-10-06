@@ -11,6 +11,6 @@ namespace BookStore.Core.Domain
         [Required]
         public string LastName { get; set; }
 
-        public List<RefreshToken> RefreshTokens { get; set; }
+        public virtual List<RefreshToken> RefreshTokens { get; set; }
     }
 }

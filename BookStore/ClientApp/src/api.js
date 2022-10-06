@@ -31,7 +31,7 @@ instance.interceptors.response.use(
                 } else {
                     originalConfig._retry = true;
                     try {
-                        const rs = await instance.post("/account/refresh-token");
+                        const rs = await instance.post("/account/refreshToken");
                         const { accessToken } = rs.data;
                         localStorage.setItem('access-token', accessToken);
                         return instance(originalConfig);

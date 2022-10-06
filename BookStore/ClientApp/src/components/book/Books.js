@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../api';
 import { Book } from './Book';
 import { Layout } from '../shared/Layout';
 
@@ -7,20 +7,17 @@ export function Books() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        async function fetchData() {
-            axios.get('/api/books/get?currentPage=1&pageSize=10')
-                .then((res) => {
-                    if (res.data.result) {
-                        setData(res.data.value);
-                    } else {
-                        console.log(res.data.errors);
-                    }
-                })
-                .catch(err => {
-                    console.log(err.response.data.errors);
-                });
-        }
-        fetchData();
+        api.get('/books/get?currentPage=1&pageSize=10')
+            .then((res) => {
+                if (res.data.result) {
+                    setData(res.data.value);
+                } else {
+                    console.log(res.data.errors);
+                }
+            })
+            .catch(err => {
+                console.log(err.response.data.errors);
+            });
     }, []);
 
     return (

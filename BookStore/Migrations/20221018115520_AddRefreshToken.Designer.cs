@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStore.Migrations
 {
     [DbContext(typeof(BookStoreDbContext))]
-    [Migration("20221006151304_AddRefreshToken")]
+    [Migration("20221018115520_AddRefreshToken")]
     partial class AddRefreshToken
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -177,15 +177,15 @@ namespace BookStore.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "d521e488-1d6a-46cb-806e-819f35286428",
-                            ConcurrencyStamp = "22265c84-261e-4acf-9514-d94bb239abba",
+                            Id = "b3ab7a5a-1ece-42c8-8a52-e7107ce7eb81",
+                            ConcurrencyStamp = "b0a6d693-0631-4692-864c-cc6f6d4478fb",
                             Name = "Visitor",
                             NormalizedName = "VISITOR"
                         },
                         new
                         {
-                            Id = "2a97f2aa-7c9f-43c4-a080-6628ef54e567",
-                            ConcurrencyStamp = "78c422d5-e664-4852-9eed-9d5b04894a23",
+                            Id = "64e02016-5aa2-4ded-afc5-f17c94bb877e",
+                            ConcurrencyStamp = "f879eb85-3fee-486d-8ed9-7a90803d5006",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

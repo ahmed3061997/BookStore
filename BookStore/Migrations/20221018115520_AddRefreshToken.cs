@@ -44,12 +44,12 @@ namespace BookStore.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "2a97f2aa-7c9f-43c4-a080-6628ef54e567", "78c422d5-e664-4852-9eed-9d5b04894a23", "Admin", "ADMIN" });
+                values: new object[] { "64e02016-5aa2-4ded-afc5-f17c94bb877e", "f879eb85-3fee-486d-8ed9-7a90803d5006", "Admin", "ADMIN" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "d521e488-1d6a-46cb-806e-819f35286428", "22265c84-261e-4acf-9514-d94bb239abba", "Visitor", "VISITOR" });
+                values: new object[] { "b3ab7a5a-1ece-42c8-8a52-e7107ce7eb81", "b0a6d693-0631-4692-864c-cc6f6d4478fb", "Visitor", "VISITOR" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -60,12 +60,12 @@ namespace BookStore.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "2a97f2aa-7c9f-43c4-a080-6628ef54e567");
+                keyValue: "64e02016-5aa2-4ded-afc5-f17c94bb877e");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "d521e488-1d6a-46cb-806e-819f35286428");
+                keyValue: "b3ab7a5a-1ece-42c8-8a52-e7107ce7eb81");
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",

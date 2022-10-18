@@ -53,14 +53,14 @@ namespace BookStore.Controllers
         }
 
         [HttpPost("refreshToken")]
-        public async Task<IResultResponse<string>> RefreshToken([FromBody] string token)
+        public async Task<IResultResponse<string>> RefreshToken(string? token)
         {
             var refreshToken = token ?? Request.Cookies[Cookies.RefreshToken];
             var result = await userService.RefreshToken(refreshToken);
 
             SetRefreshTokenCookie(result.Token.RefreshToken, result.Token.RefreshTokenExpiresOn);
 
-            return new ResultResponse<string>() { Result = true, Value = result.Token.Token};
+            return new ResultResponse<string>() { Result = true, Value = result.Token.Token };
         }
 
         [HttpPost("logout")]

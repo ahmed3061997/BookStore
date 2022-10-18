@@ -41,7 +41,7 @@ namespace BookStore.Core.Features.Auhors.Service
 
         public async Task<IEnumerable<AuthorDto>> GetAllDto()
         {
-            return await repository.Select(x => new AuthorDto() { Id = x.Id, Name = x.Name, Image = x.Image }).ToListAsync();
+            return await repository.Select(x => new AuthorDto() { Id = x.Id, Name = x.Name, Image = x.Image }).AsNoTracking().ToListAsync();
         }
 
         public async Task<IEnumerable<Author>> GetPage(int page, int size)
@@ -55,7 +55,7 @@ namespace BookStore.Core.Features.Auhors.Service
                 throw new ArgumentException("Invalid value", "size");
             }
 
-            return await repository.Skip((page - 1) * size).Take(size).ToListAsync();
+            return await repository.Skip((page - 1) * size).Take(size).AsNoTracking().ToListAsync();
         }
 
         public async Task Update(Author author)

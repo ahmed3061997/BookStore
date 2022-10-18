@@ -15,7 +15,7 @@ export function Login() {
             .then((res) => {
                 setLoading(false);
                 if (res.data.result === true) {
-                    localStorage.setItem('access-token', res.data.value.token);
+                    localStorage.setItem('access-token', res.data.value);
                     window.location.href = '/';
                 } else {
                     setErrors(res.data.errors);

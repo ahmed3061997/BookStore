@@ -3,7 +3,6 @@ using BookStore.Core.Features.Auhors.Service;
 using BookStore.Core.Features.Books.Service;
 using BookStore.Core.Generic.Middleware;
 using BookStore.Core.Generic.Utils;
-using BookStore.Core.Repositiory;
 using BookStore.Core.Repository;
 using BookStore.Core.Services;
 using BookStore.Core.Services.Authentication;
@@ -11,7 +10,6 @@ using BookStore.Core.Services.MigrationManager;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IQueryRepository<Author>, AuthorRepo>();
 builder.Services.AddScoped<IQueryRepository<Book>, BookRepo>();
+
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IFileManager, FileManager>();
@@ -37,7 +36,6 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<BookStoreDbContext>(options =>
     options
     .UseLazyLoadingProxies()
-    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
     .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.DetachedLazyLoadingWarning))
     .UseSqlServer(builder.Configuration.GetConnectionString("DbConnection")));
 

@@ -20,6 +20,10 @@ namespace BookStore.Core.Generic.Middleware
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                     if (contextFeature != null)
                     {
+                        if (contextFeature.Error.GetType() == typeof(UnauthorizedAccessException))
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                        }
                         var res = new Response()
                         {
                             Result = false,

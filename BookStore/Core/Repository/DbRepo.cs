@@ -4,7 +4,7 @@ using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace BookStore.Core.Repositiory
+namespace BookStore.Core.Repository
 {
     public class DbRepo<TEntity> : IQueryRepository<TEntity> where TEntity : class
     {

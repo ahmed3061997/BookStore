@@ -1,6 +1,6 @@
 ﻿using BookStore.Core.Domain;
 
-namespace BookStore.Core.Repositiory
+namespace BookStore.Core.Repository
 {
     public class BookRepo : DbRepo<Book>
     {

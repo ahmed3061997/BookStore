@@ -2,6 +2,7 @@
 using BookStore.Core.Generic.Constants;
 using BookStore.Core.Generic.Dto;
 using BookStore.Core.Generic.Utils;
+using BookStore.Core.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -56,14 +57,13 @@ namespace BookStore.Core.Services.Authentication
             var token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
 
             RefreshToken refreshToken;
-            if (user.RefreshTokens.Any(x => x.IsActive))
+            if (user.RefreshTokens != null && user.RefreshTokens.Any(x => x.IsActive))
             {
                 refreshToken = user.RefreshTokens.FirstOrDefault(x => x.IsActive);
             }
             else
             {
                 refreshToken = GenerateRefreshToken();
-                //user.RefreshTokens.RemoveAll(x => true);
                 user.RefreshTokens.Add(refreshToken);
                 await userManager.UpdateAsync(user);
             }

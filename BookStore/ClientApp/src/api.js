@@ -26,14 +26,14 @@ instance.interceptors.response.use(
             // Access Token was expired
             if (err.response.status === 401) {
                 localStorage.removeItem('access-token');
-                if (originalConfig._retry) {
+                if (originalConfig._retry || originalConfig.url == "/account/refreshToken") {
                     window.location = '/login';
                 } else {
                     originalConfig._retry = true;
                     try {
                         const rs = await instance.post("/account/refreshToken");
-                        const { accessToken } = rs.data;
-                        localStorage.setItem('access-token', accessToken);
+                        const { value } = rs.data;
+                        localStorage.setItem('access-token', value);
                         return instance(originalConfig);
                     } catch (_error) {
                         return Promise.reject(_error);
